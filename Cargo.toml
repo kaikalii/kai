@@ -1,0 +1,11 @@
+[package]
+name = "kai"
+version = "0.1.0"
+authors = ["Kai Schmidt <kaikaliischmidt@gmail.com>"]
+edition = "2018"
+description = "My personal prelude"
+categories = []
+keywords = []
+license = "MIT"
+
+[dependencies]
