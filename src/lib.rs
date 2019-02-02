@@ -8,20 +8,24 @@ It also adds a few functions, structs, traits and macros for convenience in comm
 * [`BoolMap`](trait.BoolMap.html) A trait intended for `bool`s that allows one-line constuction of `Option`s
 * [`variant!`](macro.variant.html) Maps an enum to an option for use with `Iterator::filter_map`
 * [`order`](order/index.html) Functions for fully ordering `PartialOrd` types
+* [`close`](close/index.html) Functions for checking if two floating-point numbers are close enough to be considered equal
 */
 
 pub use std::{
     cmp::Ordering,
     collections::{HashMap, HashSet},
     error::Error,
-    f32, f64,
+    f32::consts::PI as PI32,
+    f64::consts::PI as PI64,
     fmt::{Debug, Display, Formatter, Result as FmtResult},
     fs::{self, File},
     io::{BufRead, Read, Result as IoResult, Write},
     iter,
     ops::{Deref, DerefMut, Index, IndexMut},
     path::{Path, PathBuf},
+    rc::Rc,
     str::FromStr,
+    sync::{Arc, Mutex},
     thread::{self, JoinHandle},
     vec::IntoIter,
 };
@@ -298,5 +302,31 @@ pub mod order {
         T: PartialOrd,
     {
         a.partial_cmp(&b).unwrap_or(Ordering::Equal)
+    }
+}
+
+/**
+Functions for checking if two floating-point numbers are close enough to be considered equal
+
+These functions use the `std::f**::EPSILON` constants to check if two numbers are close
+enough for their difference to be the result of rounding errors. I made these primarily to
+get clippy off my back about directly comparing floats.
+*/
+pub mod close {
+    /// Check if two `f32`s are close enough to be considered equal
+    pub fn f32(a: f32, b: f32) -> bool {
+        (a - b).abs() < std::f32::EPSILON
+    }
+    /// Check if two `&f32`s are close enough to be considered equal
+    pub fn f32_ref(a: &f32, b: &f32) -> bool {
+        (*a - *b).abs() < std::f32::EPSILON
+    }
+    /// Check if two `f64`s are close enough to be considered equal
+    pub fn f64(a: f64, b: f64) -> bool {
+        (a - b).abs() < std::f64::EPSILON
+    }
+    /// Check if two `&f64`s are close enough to be considered equal
+    pub fn f64_ref(a: &f64, b: &f64) -> bool {
+        (*a - *b).abs() < std::f64::EPSILON
     }
 }
