@@ -25,6 +25,10 @@ I have made some very simple utilities to aid in writing Rust code:
 * [`promote_then`](fn.promote_then.html) Temporarily gain access an immutable reference as mutable
 */
 
+mod adapter;
+
+pub use adapter::*;
+
 pub use std::{
     cmp::Ordering,
     collections::{HashMap, HashSet},
@@ -154,120 +158,6 @@ where
         } else {
             None
         }
-    }
-}
-
-/**
-Wraps a reference to a string representation of some type
-
-The string can be accessed as if it were the type.
-An `Adapter` can be made for any type that implements `FromStr` and `ToString`.
-An `Adapter` must be dropped before the string can be accessed again.
-
-# Example
-```
-use kai::*;
-
-// A `Vec` of number strings
-let mut nums: Vec<String> = vec![
-    "4".into(),
-    "1".into(),
-    "-1".into(),
-];
-
-// Iterate over `Adapters` that wrap the number strings
-// The `Adapter`s can be modified as if they are numbers
-for mut n in nums.iter_mut().filter_map(|s| Adapter::<i32>::from(s).ok()) {
-    *n += 2;
-    *n *= 2;
-}
-
-assert_eq!(
-    vec!["12".to_string(), "6".into(), "2".into()],
-    nums,
-);
-```
-
-*/
-pub struct Adapter<'a, T>
-where
-    T: FromStr + ToString,
-{
-    string: &'a mut String,
-    temp: T,
-}
-
-impl<'a, T> Adapter<'a, T>
-where
-    T: FromStr + ToString,
-{
-    /// Create a new `Adapter` from a `String`
-    pub fn from(string: &'a mut String) -> Result<Adapter<'a, T>, T::Err> {
-        string.parse().map(move |temp| Adapter { string, temp })
-    }
-}
-
-impl<'a, T> Deref for Adapter<'a, T>
-where
-    T: FromStr + ToString,
-{
-    type Target = T;
-    fn deref(&self) -> &Self::Target {
-        &self.temp
-    }
-}
-
-impl<'a, T> DerefMut for Adapter<'a, T>
-where
-    T: FromStr + ToString,
-{
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.temp
-    }
-}
-
-impl<'a, T> Drop for Adapter<'a, T>
-where
-    T: FromStr + ToString,
-{
-    fn drop(&mut self) {
-        *self.string = self.temp.to_string()
-    }
-}
-
-impl<'a, T> Debug for Adapter<'a, T>
-where
-    T: FromStr + ToString,
-{
-    fn fmt(&self, f: &mut Formatter) -> FmtResult {
-        <String as Debug>::fmt(self.string, f)
-    }
-}
-
-impl<'a, T> Display for Adapter<'a, T>
-where
-    T: FromStr + ToString,
-{
-    fn fmt(&self, f: &mut Formatter) -> FmtResult {
-        <String as Display>::fmt(self.string, f)
-    }
-}
-
-impl<'a, T> AsRef<T> for Adapter<'a, T>
-where
-    T: FromStr + ToString,
-{
-    fn as_ref(&self) -> &T {
-        &self.temp
-    }
-}
-
-impl<'a, T> std::borrow::Borrow<T> for Adapter<'a, T>
-where
-    T: FromStr + ToString,
-{
-    fn borrow(&self) -> &T {
-        &self.temp
     }
 }
 
