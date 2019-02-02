@@ -3,7 +3,7 @@
 /*!
 # Description
 
-This library contains my person Rust prelude and utilities.
+This library contains my personal Rust prelude and utilities.
 
 # Design goals
 
@@ -27,6 +27,7 @@ I have made some very simple utilities to aid in writing Rust code:
 
 ### Structs
 * [`Adapter`](struct.Adapter.html) Wraps a reference to a string representation of some type
+* [`Swap`](struct.Swap.html) Wrapper that allows consuming transformations on borrowed data
 
 ### Macros
 * [`variant!`](macro.variant.html) Maps an enum to an option for use with `Iterator::filter_map`
@@ -65,7 +66,7 @@ macro_rules! transparent_mod {
     }
 }
 
-transparent_mod!(adapter);
+transparent_mod!(adapter, swap);
 
 pub use std::{
     cmp::Ordering,

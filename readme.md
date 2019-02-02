@@ -1,6 +1,6 @@
 ### Description
 
-This library contains my person Rust prelude and utilities.
+This library contains my personal Rust prelude and utilities.
 
 ### Design goals
 
