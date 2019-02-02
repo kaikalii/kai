@@ -1,14 +1,27 @@
 #![deny(missing_docs)]
 
 /*!
-This crate reexports my most commonly used parts of the Rust standard library.
-It also adds a few functions, structs, traits and macros for convenience in common patterns:
+# Description
 
-* [`Adapter`](struct.Adapter.html) Wraps a reference to a string representation of some type
+This library contains my person Rust prelude and utilities.
+
+# Design goals
+
+* Remove the hassle of having to add `use` statements for very common standard library types
+* Reduce the amount of code that actually has to be written
+* Alleviate common Rust pain points
+
+This library is meant to improve your experience writing Rust no matter what you are writing code for. The patterns it tackles are mostly ones that the average Rust programmer encounters on a daily basis.
+
+# Utilities
+
+I have made some very simple utilities to aid in writing Rust code:
+
 * [`BoolMap`](trait.BoolMap.html) A trait intended for `bool`s that allows one-line constuction of `Option`s
 * [`variant!`](macro.variant.html) Maps an enum to an option for use with `Iterator::filter_map`
 * [`order`](order/index.html) Functions for fully ordering `PartialOrd` types
 * [`close`](close/index.html) Functions for checking if two floating-point numbers are close enough to be considered equal
+* [`Adapter`](struct.Adapter.html) Wraps a reference to a string representation of some type
 */
 
 pub use std::{
