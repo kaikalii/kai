@@ -65,7 +65,7 @@ macro_rules! transparent_mod {
     }
 }
 
-transparent_mod!(adapter, hybrid_iter);
+transparent_mod!(adapter);
 
 pub use std::{
     cmp::Ordering,

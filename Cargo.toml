@@ -8,5 +8,7 @@ categories = []
 keywords = ["utilities", "utility", "prelude"]
 license = "MIT"
 readme = "readme.md"
+documentation = "docs.rs/kai"
+repository = "github.com/kaikalii/kai"
 
 [dependencies]
