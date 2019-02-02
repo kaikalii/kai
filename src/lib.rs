@@ -22,6 +22,7 @@ I have made some very simple utilities to aid in writing Rust code:
 * [`order`](order/index.html) Functions for fully ordering `PartialOrd` types
 * [`close`](close/index.html) Functions for checking if two floating-point numbers are close enough to be considered equal
 * [`Adapter`](struct.Adapter.html) Wraps a reference to a string representation of some type
+* [`promote_then`](fn.promote_then.html) Temporarily gain access an immutable reference as mutable
 */
 
 pub use std::{
@@ -121,7 +122,7 @@ let s = if condition {
 };
 
 // Into this:
-condition.map_with(String::new);
+let s = condition.map_with(String::new);
 ```
 */
 pub trait BoolMap {
@@ -342,4 +343,32 @@ pub mod close {
     pub fn f64_ref(a: &f64, b: &f64) -> bool {
         (*a - *b).abs() < std::f64::EPSILON
     }
+}
+
+/**
+Temporarily gain access an immutable reference as mutable
+
+This function attempts to make promoting a reference to be mutable slightly less unsafe.
+It does this by wrapping access to the mutable reference in a closure, thus bounding
+the lifetime. This allows the compiler to reject certain unsafe behaviors and misuse
+of the mutable reference. That being said, there are probably still a ton of things
+that could go wrong, so this function is still marked `unsafe`. If you are someone who
+knows the specific ways that using this function could still cause undefined behvaior,
+please let me know by emailing me or opening an issue.
+
+# Example
+```
+use kai::*;
+
+let v = vec![5];
+let x = unsafe { promote_then(&v, |v| v.remove(0)) };
+assert!(v.is_empty());
+assert_eq!(5, x);
+```
+*/
+pub unsafe fn promote_then<T, R, F>(var: &T, f: F) -> R
+where
+    F: FnOnce(&mut T) -> R,
+{
+    f((var as *const T as *mut T).as_mut().unwrap())
 }
