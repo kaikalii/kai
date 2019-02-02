@@ -17,17 +17,55 @@ This library is meant to improve your experience writing Rust no matter what you
 
 I have made some very simple utilities to aid in writing Rust code:
 
-* [`BoolMap`](trait.BoolMap.html) A trait intended for `bool`s that allows one-line constuction of `Option`s
-* [`variant!`](macro.variant.html) Maps an enum to an option for use with `Iterator::filter_map`
+### Functions
 * [`order`](order/index.html) Functions for fully ordering `PartialOrd` types
 * [`close`](close/index.html) Functions for checking if two floating-point numbers are close enough to be considered equal
-* [`Adapter`](struct.Adapter.html) Wraps a reference to a string representation of some type
 * [`promote_then`](fn.promote_then.html) Temporarily gain access an immutable reference as mutable
+
+### Traits
+* [`BoolMap`](trait.BoolMap.html) Maps `bool`s to `Option`s in one line
+
+### Structs
+* [`Adapter`](struct.Adapter.html) Wraps a reference to a string representation of some type
+
+### Macros
+* [`variant!`](macro.variant.html) Maps an enum to an option for use with `Iterator::filter_map`
+* [`transparent_mod!`](macro.transparent_mod.html) Declares transparent external child modules
 */
 
-mod adapter;
+/**
+Declares transparent external child modules
 
-pub use adapter::*;
+# Example
+```ignore
+use kai::*;
+
+transparent_mod!(foo, bar, baz);
+
+// Expands to
+
+mod foo;
+pub use foo::*;
+mod bar;
+pub use bar::*;
+mod baz;
+pub use baz::*;
+```
+*/
+#[macro_export]
+macro_rules! transparent_mod {
+    ($($mod:ident),*) => {
+        $(
+            mod $mod;
+            pub use $mod::*;
+        )*
+    };
+    ($($mod:ident,)*) => {
+        transparent_mod!($($mod),*);
+    }
+}
+
+transparent_mod!(adapter, hybrid_iter);
 
 pub use std::{
     cmp::Ordering,
@@ -110,7 +148,7 @@ macro_rules! variant {
 }
 
 /**
-A trait intended for `bool`s that allows one-line constuction of `Option`s
+Maps `bool`s to `Option`s in one line
 
 # Example
 ```
