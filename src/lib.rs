@@ -20,7 +20,7 @@ I have made some very simple utilities to aid in writing Rust code:
 ### Functions
 * [`order`](order/index.html) Functions for fully ordering `PartialOrd` types
 * [`close`](close/index.html) Functions for checking if two floating-point numbers are close enough to be considered equal
-* [`promote_then`](fn.promote_then.html) Temporarily gain access an immutable reference as mutable
+* [`promote_then`](fn.promote_then.html) Temporarily gain access to an immutable reference as mutable
 
 ### Traits
 * [`BoolMap`](trait.BoolMap.html) Maps `bool`s to `Option`s in one line
@@ -32,6 +32,8 @@ I have made some very simple utilities to aid in writing Rust code:
 
 ### Types
 * [`DynResult`](type.DynResult.html) A dynamic `Result` type
+* [`IoResult`](type.IoResult.html) An alias for `io::Result`
+* [`FmtResult`](type.FmtResult.html) An alias for `fmt::Result`
 
 ### Macros
 * [`variant!`](macro.variant.html) Maps an enum to an option for use with `Iterator::filter_map`
@@ -78,11 +80,11 @@ pub use std::{
     error::Error,
     f32::consts::PI as PI32,
     f64::consts::PI as PI64,
-    fmt::{Debug, Display, Formatter, Result as FmtResult},
+    fmt::{Debug, Display, Formatter},
     fs::{self, File},
-    io::{BufRead, Read, Result as IoResult, Write},
+    io::{stdin, BufRead, Read, Write},
     iter,
-    ops::{Deref, DerefMut, Index, IndexMut},
+    ops::{self, Deref, DerefMut, Index, IndexMut},
     path::{Path, PathBuf},
     rc::Rc,
     str::FromStr,
@@ -170,6 +172,8 @@ let s = if condition {
 
 // Into this:
 let s = condition.map_with(String::new);
+
+assert_eq!(Some(String::new()), s);
 ```
 */
 pub trait BoolMap {
@@ -242,6 +246,16 @@ impl<T> Bind for T {}
 An dynamic `Result` type
 */
 pub type DynResult<T> = Result<T, Box<dyn Error>>;
+
+/**
+An alias for `io::Result`
+*/
+pub type IoResult<T> = std::io::Result<T>;
+
+/**
+An alias for `fmt::Result`
+*/
+pub type FmtResult = std::fmt::Result;
 
 /**
 Functions for fully ordering `PartialOrd` types
@@ -318,7 +332,7 @@ pub mod close {
 }
 
 /**
-Temporarily gain access an immutable reference as mutable
+Temporarily gain access to an immutable reference as mutable
 
 This function attempts to make promoting a reference to be mutable slightly less unsafe.
 It does this by wrapping access to the mutable reference in a closure, thus bounding
