@@ -3,7 +3,7 @@ use super::*;
 /**
 Wrapper that allows consuming transformations on borrowed data
 
-This is useful when you have a mutable interface wrapping a functional one.
+This is useful when you want a mutable interface wrapping a functional one.
 
 # Example
 ```

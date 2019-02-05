@@ -1,11 +1,11 @@
 use super::*;
 
 /**
-Wraps a reference to a string representation of some type
+Wraps a reference to a `String` representation of some type
 
-The string can be accessed as if it were the type.
+The `String` can be accessed as if it were the type.
 An `Adapter` can be made for any type that implements `FromStr` and `Display`.
-An `Adapter` must be dropped before the string can be accessed again.
+An `Adapter` must be dropped before the `String` can be accessed again.
 
 # Example
 ```
