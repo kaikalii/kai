@@ -24,6 +24,7 @@ I have made some very simple utilities to aid in writing Rust code:
 
 ### Traits
 * [`BoolMap`](trait.BoolMap.html) Maps `bool`s to `Option`s in one line
+* [`Bind`](trait.Bind.html) Allows the binding and mutation of a value in a single line
 
 ### Structs
 * [`Adapter`](struct.Adapter.html) Wraps a reference to a string representation of some type
@@ -202,6 +203,40 @@ where
         }
     }
 }
+
+/**
+Allows the binding and mutation of a value in a single line
+
+This is useful when you want a functional interface wrapping a mutable one,
+or when you really feel like doing something in one line.
+
+# Example
+```
+use kai::*;
+
+// Turn this
+let mut a = vec![1, 4, 2, 1, 3, 2, 2];
+a.sort();
+a.dedup();
+
+// Into this
+let b = vec![1, 4, 2, 1, 3, 2, 2].bind(|v| v.sort()).bind(Vec::dedup);
+
+assert_eq!(a, b);
+```
+*/
+pub trait Bind: Sized {
+    /// Binds the value, mutates it, and returns it
+    fn bind<F>(mut self, mut f: F) -> Self
+    where
+        F: FnMut(&mut Self),
+    {
+        f(&mut self);
+        self
+    }
+}
+
+impl<T> Bind for T {}
 
 /**
 An dynamic `Result` type
