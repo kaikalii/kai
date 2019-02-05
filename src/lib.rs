@@ -29,6 +29,9 @@ I have made some very simple utilities to aid in writing Rust code:
 * [`Adapter`](struct.Adapter.html) Wraps a reference to a string representation of some type
 * [`Swap`](struct.Swap.html) Wrapper that allows consuming transformations on borrowed data
 
+### Types
+* [`DynResult`](type.DynResult.html) A dynamic `Result` type
+
 ### Macros
 * [`variant!`](macro.variant.html) Maps an enum to an option for use with `Iterator::filter_map`
 * [`transparent_mod!`](macro.transparent_mod.html) Declares transparent external child modules
@@ -199,6 +202,11 @@ where
         }
     }
 }
+
+/**
+An dynamic `Result` type
+*/
+pub type DynResult<T> = Result<T, Box<dyn Error>>;
 
 /**
 Functions for fully ordering `PartialOrd` types
