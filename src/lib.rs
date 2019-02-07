@@ -25,6 +25,7 @@ I have made some very simple utilities to aid in writing Rust code:
 ### Traits
 * [`BoolMap`](trait.BoolMap.html) Maps `bool`s to `Option`s in one line
 * [`Bind`](trait.Bind.html) Allows the binding and mutation of a value in a single line
+* [`KaiIterator`](trait.KaiIterator.html) Generates my custom iterator adapters
 
 ### Structs
 * [`Adapter`](struct.Adapter.html) Wraps a reference to a string representation of some type
@@ -241,6 +242,81 @@ pub trait Bind: Sized {
 }
 
 impl<T> Bind for T {}
+
+/**
+An iterator adaptor created by [`KaiIterator::chain_if`](trait.KaiIterator.html#method.chain_if)
+*/
+pub enum ChainIf<I, J>
+where
+    I: IntoIterator,
+    J: IntoIterator<Item = I::Item>,
+{
+    /// The iterator was chained
+    Chained(I::IntoIter, J::IntoIter),
+    /// The iterator was not chained
+    NotChained(I::IntoIter),
+}
+
+impl<I, J> Iterator for ChainIf<I, J>
+where
+    I: IntoIterator,
+    J: IntoIterator<Item = I::Item>,
+{
+    type Item = I::Item;
+    fn next(&mut self) -> Option<Self::Item> {
+        use ChainIf::*;
+        match self {
+            Chained(first, second) => first.next().or_else(|| second.next()),
+            NotChained(iter) => iter.next(),
+        }
+    }
+}
+
+/**
+Generates my custom iterator adapters
+
+For convenience, this is implmented for all types that
+implement not just [`Iterator`](https://doc.rust-lang.org/std/iter/trait.Iterator.html),
+but [`IntoIterator`](https://doc.rust-lang.org/std/iter/trait.IntoIterator.html) as well.
+
+See methods for usage.
+*/
+pub trait KaiIterator: IntoIterator + Sized {
+    /**
+    Chain this iterator with another if the condition is true
+
+    # Example
+    ```
+    use kai::*;
+
+    let condition = true;
+
+    // Turn this
+    let mut v = vec![1, 2, 3];
+    if condition {
+        v.extend(vec![4, 5, 6])
+    }
+
+    // Into this
+    let w: Vec<_> = vec![1, 2, 3].chain_if(condition, || vec![4, 5, 6]).collect();
+
+    assert_eq!(v, w);
+    ```
+    */
+    fn chain_if<I, F>(self, condition: bool, mut f: F) -> ChainIf<Self, I>
+    where
+        I: IntoIterator<Item = Self::Item>,
+        F: FnMut() -> I,
+    {
+        if condition {
+            ChainIf::Chained(self.into_iter(), f().into_iter())
+        } else {
+            ChainIf::NotChained(self.into_iter())
+        }
+    }
+}
+
+impl<I> KaiIterator for I where I: IntoIterator + Sized {}
 
 /**
 An dynamic `Result` type
