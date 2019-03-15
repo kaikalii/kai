@@ -225,19 +225,26 @@ a.sort();
 a.dedup();
 
 // Into this
-let b = vec![1, 4, 2, 1, 3, 2, 2].bind(|v| v.sort()).bind(Vec::dedup);
+let b = vec![1, 4, 2, 1, 3, 2, 2].bind_mut(|v| v.sort()).bind(Vec::dedup);
 
 assert_eq!(a, b);
 ```
 */
 pub trait Bind: Sized {
     /// Binds the value, mutates it, and returns it
-    fn bind<F>(mut self, mut f: F) -> Self
+    fn bind_mut<F>(mut self, mut f: F) -> Self
     where
         F: FnMut(&mut Self),
     {
         f(&mut self);
         self
+    }
+    /// Binds the value, maps it with the function, and returns the mapped value
+    fn bind_map<F, R>(self, mut f: F) -> R
+    where
+        F: FnMut(Self) -> R,
+    {
+        f(self)
     }
 }
 
@@ -389,6 +396,7 @@ enough for their difference to be the result of rounding errors. I made these pr
 get clippy off my back about directly comparing floats.
 */
 pub mod close {
+    #![allow(clippy::trivially_copy_pass_by_ref)]
     /// Check if two `f32`s are close enough to be considered equal
     pub fn f32(a: f32, b: f32) -> bool {
         (a - b).abs() < std::f32::EPSILON
