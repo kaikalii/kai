@@ -39,6 +39,7 @@ I have made some very simple utilities to aid in writing Rust code:
 ### Macros
 * [`variant!`](macro.variant.html) Maps an enum to an option for use with `Iterator::filter_map`
 * [`transparent_mod!`](macro.transparent_mod.html) Declares transparent external child modules
+* [`cond_vec!`](macro.cond_vec.html) Conditionally construct `Vec`s
 */
 
 /**
@@ -215,7 +216,7 @@ Allows the binding and mutation of a value in a single line
 This is useful when you want a functional interface wrapping a mutable one,
 or when you really feel like doing something in one line.
 
-# Example
+# `bind_mut` example
 ```
 use kai::*;
 
@@ -226,6 +227,20 @@ a.dedup();
 
 // Into this
 let b = vec![1, 4, 2, 1, 3, 2, 2].bind_mut(|v| v.sort()).bind_mut(Vec::dedup);
+
+assert_eq!(a, b);
+```
+
+# `bind_map` example
+```
+use kai::*;
+
+// Turn this
+let x = 2i32.pow(3);
+let a = x / 3;
+
+// Into this
+let b = 2i32.pow(3).bind_map(|x| x / 3);
 
 assert_eq!(a, b);
 ```
@@ -509,4 +524,43 @@ where
     F: FnOnce(&mut T) -> R,
 {
     f((var as *const T as *mut T).as_mut().unwrap())
+}
+
+/**
+Conditionally construct `Vec`s
+
+# Syntax
+```ignore
+cond_vec![ condition => element, condition => element, ... ]
+```
+
+# Example
+```
+use kai::*;
+
+let mary_is_invited = true;
+let dan_is_invited = false;
+
+let guest_list = cond_vec![
+    true => "Tom",
+    true => "Steven",
+    mary_is_invited => "Mary",
+    dan_is_invited => "Dan",
+];
+
+assert_eq!(
+    guest_list,
+    vec!["Tom", "Steven", "Mary"]
+);
+```
+*/
+#[macro_export]
+macro_rules! cond_vec {
+    ($($cond:expr => $elem:expr),* $(,)*) => {{
+        let mut new_vec = Vec::new();
+        $(if $cond {
+            new_vec.push($elem);
+        })*
+        new_vec
+    }};
 }
