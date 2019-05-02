@@ -17,6 +17,9 @@ This library is meant to improve your experience writing Rust no matter what you
 
 I have made some very simple utilities to aid in writing Rust code:
 
+### Modules
+* [`thread`](thread/index.html) Adds custom thread type as well as reexporting `std::thread::*` for convenience.
+
 ### Functions
 * [`order`](order/index.html) Functions for fully ordering `PartialOrd` types
 * [`close`](close/index.html) Functions for checking if two floating-point numbers are close enough to be considered equal
@@ -75,6 +78,7 @@ macro_rules! transparent_mod {
 }
 
 transparent_mod!(adapter, swap);
+pub mod thread;
 
 pub use std::{
     cmp::Ordering,
@@ -91,7 +95,6 @@ pub use std::{
     rc::Rc,
     str::FromStr,
     sync::{Arc, Mutex},
-    thread::{self, JoinHandle},
     vec::IntoIter,
 };
 
